@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import org.modelmapper.ModelMapper;
@@ -20,9 +19,30 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-
+import org.springframework.transaction.annotation.Transactional;
 
 import lombok.extern.slf4j.Slf4j;
+/****************************************************************************************************************************************
+ * By applying @Transactional at the service layer, you ensure that each service method operates within a transaction boundary, 
+ * providing atomicity, consistency, isolation, and durability (ACID properties) for database operations.
+ * 
+ * where to use @Transactional:
+
+* Service Layer: Annotate service methods with @Transactional. These methods orchestrate business logic, perform CRUD operations, 
+  and coordinate interactions between different components of your application.
+
+* Controller Layer: Avoid using @Transactional in controllers. Controllers should focus on handling HTTP requests, 
+ delegating business logic to service layer components, and preparing data for presentation.
+
+* Repository Layer: Do not use @Transactional in repository interfaces or classes. Spring Data JPA provides transaction
+  management automatically for methods that interact with the database. However, if you have custom repository methods that require
+  transactional behavior, you can add @Transactional to those methods.
+  *
+  
+  
+ * @author saba akhtar
+ *
+ */
 
 @Service(value="bookService")
 @Slf4j
@@ -69,6 +89,7 @@ public class BookServiceImpl implements BookService {
 
 
 	@Override
+	@Transactional
 	public String addBook(BookDTO bookDTO) throws MyBookException {
 		
 			
@@ -100,12 +121,14 @@ public class BookServiceImpl implements BookService {
 
 	
 	@Override
+	@Transactional(readOnly = true)
 	public Page<Book> findAll(Pageable page) {
 		
 		return bookRepository.findAll(page);
 	}
     
 	@Override
+	@Transactional(readOnly = true)
 	public List<Book> findAllSorted (Sort sort) {
 		List<Book> sortedBookEntities = new ArrayList<>();
 		Iterable<Book> bookEntityIterable =bookRepository.findAll(sort);
@@ -120,6 +143,7 @@ public class BookServiceImpl implements BookService {
 
 
 	@Override
+	@Transactional(readOnly = true)
 	public List<BookDTO> getBookByAuthorName(String authorName) throws MyBookException {
 	
 		
@@ -138,6 +162,7 @@ public class BookServiceImpl implements BookService {
 
 
 	@Override
+	@Transactional(readOnly = true)
 	public List<BookDTO> getBookGreaterThanEqualToPrice(Integer price) throws Exception{
 		
 		List<Book> listOfbookEntity = bookRepository.findByPriceGreaterThanEqual(price);
@@ -154,6 +179,7 @@ public class BookServiceImpl implements BookService {
 
 
 	@Override
+	@Transactional(readOnly = true)
 	public List<BookDTO> getBookLessThanPrice(Integer price) throws MyBookException {
       List<Book> books = bookRepository.findByPriceLessThan(price);
 		
@@ -170,6 +196,7 @@ public class BookServiceImpl implements BookService {
 
 
 	@Override
+	@Transactional(readOnly = true)
 	public List<BookDTO> getAllBooksPublishBetween(LocalDate startDate, LocalDate endDate) throws Exception {
 		try { 
 		
@@ -192,6 +219,7 @@ public class BookServiceImpl implements BookService {
 
 
 	@Override
+	@Transactional(readOnly = true)
 	public List<BookDTO> booksPublishedAfterYear(LocalDate yearPublished) {
 		
 		List<Book> books = bookRepository.getAllBooksAfterPublishedDate(yearPublished);
@@ -204,6 +232,7 @@ public class BookServiceImpl implements BookService {
 
 
 	@Override
+	@Transactional(readOnly = true)
 	public List<BookDTO> getbooksByAuthorNameAndPublisher(String authorName, String publisher) {
 		
 		List<Book> books = bookRepository.getAllBooksByAuthorAndPublisher(authorName, publisher);
@@ -217,6 +246,7 @@ public class BookServiceImpl implements BookService {
 
 
 	@Override
+	@Transactional
 	public void updateBookPrice(Integer bookId, Integer price) throws Exception {
 		
 		try {
@@ -238,6 +268,7 @@ public class BookServiceImpl implements BookService {
 
 
 	@Override
+	@Transactional
 	public void deleteBook(Integer bookId) throws Exception {
 		Optional<Book> bookEntityOptional=	bookRepository.findById(bookId);
 		if (bookEntityOptional.isPresent()) {
@@ -249,8 +280,5 @@ public class BookServiceImpl implements BookService {
 		}
 		
 	}
-
-
-	
 
 }

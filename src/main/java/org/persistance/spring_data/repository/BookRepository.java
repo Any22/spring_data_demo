@@ -1,16 +1,22 @@
 package org.persistance.spring_data.repository;
 
 import java.time.LocalDate;
+
 import java.util.List;
-import java.util.Optional;
+
 
 import org.persistance.spring_data.entity.Book;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-
+/***********************************************************************************************************************************
+ *  The @Modifying annotation is typically used in conjunction with custom query methods in Spring Data JPA repositories to indicate 
+ *  that the method will modify the database state. It tells the Spring Data framework that the query is an update or delete 
+ *  operation, rather than a select operation.
+ * @author saba akhtar
+ * we haven't use it here since we are not using any special update or delete
+ **************************************************************************************************************************************/
 @Repository
 public interface BookRepository extends CrudRepository<Book,Integer>,PagingAndSortingRepository<Book,Integer> {
 	
